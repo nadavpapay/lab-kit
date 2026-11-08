@@ -17,7 +17,16 @@ npm run dev
 That writes a small Vite app with one example lab, installs it and makes a
 first commit. It opens at `http://localhost:5170/lab`.
 
-To teach Claude Code how to work in it, once per machine:
+Or from a copy of this folder (a clone, or an unzipped zip), with no GitHub
+needed. The new lab links to that folder, so keep it where it is:
+
+```bash
+cd lab-kit && npm install
+node bin/lab-kit.mjs new ../my-lab --name "Acme lab"
+```
+
+To teach Claude Code how to work in it, once per machine (or
+`node bin/lab-kit.mjs skill` from a copy):
 
 ```bash
 npx github:nadavpapay/lab-kit skill

@@ -46,8 +46,10 @@ function newLab() {
   const id = flag("id", basename(dir).toLowerCase().replace(/-?lab$/, "").replace(/[^a-z0-9-]+/g, "-").replace(/^-|-$/g, "") || "lab")
   const name = flag("name", `${id.charAt(0).toUpperCase()}${id.slice(1)} lab`)
   const port = flag("port", "5170")
-  let source = flag("from", pkg.labKit?.source)
-  if (!source || source.includes("OWNER")) source = `file:${KIT}`
+  /* Run from a folder of its own (a clone, or an unzipped copy), the lab links
+     to that folder; run with npx, it installs from GitHub. */
+  const local = !KIT.split(/[\\/]/).includes("_npx")
+  let source = flag("from", local ? `file:${KIT}` : pkg.labKit?.source)
   /* A local clone is named relative to the lab, so the two can move together. */
   if (source.startsWith("file:")) source = `file:${relative(dir, resolve(source.slice(5))) || "."}`
 
