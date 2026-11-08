@@ -12,7 +12,7 @@
     "lab-kit": "./bin/lab-kit.mjs"
   },
   "labKit": {
-    "source": "github:OWNER/lab-kit"
+    "source": "github:nadavpapay/lab-kit"
   },
   "scripts": {
     "check": "tsc --noEmit"

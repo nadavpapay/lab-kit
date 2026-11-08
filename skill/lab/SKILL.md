@@ -13,7 +13,7 @@ that; your job is the rounds.
 ## Starting a lab in a project
 
 ```bash
-npx github:OWNER/lab-kit new <folder> --name "Acme lab"
+npx github:nadavpapay/lab-kit new <folder> --name "Acme lab"
 ```
 
 It writes the starter beside the project (its own small Vite app), installs

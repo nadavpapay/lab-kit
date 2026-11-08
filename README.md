@@ -9,7 +9,7 @@ next time.
 On any laptop with Node 20 or newer:
 
 ```bash
-npx github:OWNER/lab-kit new my-lab --name "Acme lab"
+npx github:nadavpapay/lab-kit new my-lab --name "Acme lab"
 cd my-lab
 npm run dev
 ```
@@ -20,7 +20,7 @@ first commit. It opens at `http://localhost:5170/lab`.
 To teach Claude Code how to work in it, once per machine:
 
 ```bash
-npx github:OWNER/lab-kit skill
+npx github:nadavpapay/lab-kit skill
 ```
 
 ## What you get
