@@ -1,0 +1,4 @@
+node_modules
+dist
+lab-data.json
+.DS_Store

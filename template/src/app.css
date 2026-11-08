@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@source "../node_modules/lab-kit/src";
+
+/* The lab's colours are set in lab-kit/lab.css. Set any of them here to make
+   the lab match the project, for example:
+   :root { --lab-star: #e11d48; } */

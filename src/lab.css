@@ -1,0 +1,26 @@
+/* The lab's look. Every colour the frame uses is one of these, so a project
+   can set any of them after this file to make the lab its own. */
+:root {
+  --lab-chrome: #eceef0; /* the page behind the rounds */
+  --lab-rail: #e3e5e8; /* the rail of labs */
+  --lab-paper: #ffffff; /* picked rows, menus, the picked option */
+  --lab-ink: #18181b; /* text */
+  --lab-muted: #52525b; /* secondary text */
+  --lab-quiet: #8a8f98; /* labels and marks */
+  --lab-line: rgb(0 0 0 / 0.07); /* dividers and borders */
+  --lab-hover: rgb(0 0 0 / 0.05); /* menu rows under the pointer */
+  --lab-ring: rgb(59 130 246 / 0.5); /* keyboard focus */
+  --lab-star: #f97316; /* stars */
+  --lab-doing: rgb(36 156 213); /* In progress */
+  --lab-review: rgb(217 119 6); /* In review */
+  --lab-done: rgb(29 155 87); /* Done */
+}
+
+.lab-star { animation: lab-star 220ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes lab-star { from { transform: scale(0.6); } }
+
+.lab-fade { animation: lab-fade 150ms ease-out; }
+@keyframes lab-fade { from { opacity: 0; } }
+
+.lab-pop { animation: lab-pop 150ms ease-out; }
+@keyframes lab-pop { from { opacity: 0; transform: translateY(-4px); } }

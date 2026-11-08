@@ -1,0 +1,37 @@
+{
+  "name": "lab-kit",
+  "version": "0.1.0",
+  "description": "A design lab for any project: rounds of options, stars, side by side, dials and statuses.",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./lab.css": "./src/lab.css"
+  },
+  "bin": {
+    "lab-kit": "./bin/lab-kit.mjs"
+  },
+  "labKit": {
+    "source": "github:OWNER/lab-kit"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "lucide-react": ">=0.400.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "lucide-react": "^1.53.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typescript": "~6.0.2"
+  }
+}
