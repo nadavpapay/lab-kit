@@ -13,8 +13,8 @@ import { cn } from "./cn"
 
    The first line says where you are, what the part asks behind an info mark,
    the versions to pick from and whatever the lab needs to set beside them.
-   The second is what the picked version does, cut to one line; the whole of
-   it is on the line's hover. Nothing else is written on the page.
+   The second is what the picked version does, in up to two lines; a longer
+   one is on the line's hover. Nothing else is written on the page.
 
    Wherever there are versions, the one picked can be starred, with the star
    after the picks or with S, and the starred ones keep a star on their pick.
@@ -237,7 +237,7 @@ export function LabHead({
       </div>
       {dials && dials.length > 0 && <Dials dials={dials} />}
       {says && (
-        <p title={says} className="m-0 max-w-[880px] truncate text-xs leading-4 text-(--lab-muted)">
+        <p title={says} className="m-0 max-w-[1100px] text-pretty line-clamp-2 text-xs leading-4 text-(--lab-muted)">
           {says}
         </p>
       )}

@@ -241,7 +241,7 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
         className="flex h-dvh w-full overflow-hidden bg-(--lab-chrome) font-sans text-(--lab-ink)"
       >
         {/* More labs than the screen is tall: the rail scrolls on its own, its bar hidden so it keeps its width. */}
-        <nav aria-label="Labs" className="flex min-h-0 w-16 shrink-0 flex-col items-center gap-3 overflow-y-auto overscroll-contain border-r border-(--lab-line) bg-(--lab-rail) py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <nav aria-label="Labs" className="flex min-h-0 w-20 shrink-0 flex-col items-center gap-3 overflow-y-auto overscroll-contain border-r border-(--lab-line) bg-(--lab-rail) py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <RailRuns rail="rail" items={rail.sort(FEATURES)} picked={feature.id} stage={(id) => status[keys.status(id)]} onMove={rail.move}>
             {(f, lifted) => (
               <RailItem

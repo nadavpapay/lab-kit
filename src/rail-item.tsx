@@ -111,7 +111,17 @@ export function RailItem({
         >
           <Icon className="size-[18px]" strokeWidth={1.75} />
         </span>
-        <span className={cn("text-[11px] leading-[14px]", on ? "text-(--lab-ink)" : "text-(--lab-quiet) group-hover/f:text-(--lab-muted)")}>{name}</span>
+        {/* The name stays inside the rail: it wraps and is cut after three
+            lines, so a long one never widens the item past the rail's edge. */}
+        <span
+          className={cn(
+            "w-16 text-center text-[11px] leading-[14px] text-balance hyphens-auto line-clamp-3 [overflow-wrap:anywhere]",
+            on ? "text-(--lab-ink)" : "text-(--lab-quiet) group-hover/f:text-(--lab-muted)",
+          )}
+          title={name}
+        >
+          {name}
+        </span>
       </button>
 
       {/* The corner dot, which is also where the status is changed. It is
