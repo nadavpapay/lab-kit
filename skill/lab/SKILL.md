@@ -37,8 +37,8 @@ the lab's `vite.config.ts`.
   `useDial("<key>", "<Name>", [{ id, name, title? }])`, passed as
   `dials={[...]}`. A state (hover, empty, error) is a dial too. A take on an
   option is a dial, not a new lab.
-- **asks** = one or two sentences on what the round is asking, behind the
-  info mark. **says** = what the picked option does, one line.
+- **asks** = one or two sentences on what the round is asking. **says** =
+  what the picked option does, one line. Both sit behind the info mark.
 
 ## Rules
 

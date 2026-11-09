@@ -11,11 +11,12 @@ import { cn } from "./cn"
 /* The head every lab shares, kept short so the version below it is seen at
    close to its real size.
 
-   The first line says where you are and what the part asks behind an info
-   mark, with the star, See all and the dials on its right. The second is the
-   versions, as one switch. The third is what the picked version does, in up
-   to two lines; a longer one is on the line's hover. Nothing else is written
-   on the page.
+   It is one line. On the left, the link and an info mark that holds what the
+   part asks and what the picked version does. Then the versions, each a chip
+   with its letter, the picked one with its whole name, so twenty fit on the
+   line; a chip says its name at once on hover. On the right, the star, See
+   all and the dials. Where you are is the drawer's to say, so the line names
+   the lab and round only while the drawer is hidden.
 
    Wherever there are versions, the one picked can be starred, with the star
    after the picks or with S, and the starred ones keep a star on their pick.
@@ -170,14 +171,53 @@ export function LabHead({
 
   return (
     <>
-    <header ref={setBlock} className={cn("flex shrink-0 flex-col gap-2 px-6 pt-4 pb-3", className)}>
-      {/* Where you are on the left; the star, See all and the dials on the right. */}
-      <div className="flex min-h-8 items-center gap-2">
-        <div className="flex min-w-0 items-center gap-1">
+    <header ref={setBlock} className={cn("flex shrink-0 px-6 py-3", className)}>
+      {/* One row: the link and the info mark, the versions, then the star,
+          See all and the dials on the right. */}
+      <div className="flex min-h-8 w-full items-center gap-3">
+        <div className="flex shrink-0 items-center gap-1">
           {crumb}
-          {about && <About>{about}</About>}
+          {(about || says) && <About asks={about} name={name} says={says} />}
           {shownAs && <div className="ml-2 flex items-center">{shownAs}</div>}
         </div>
+        {shown && shown.length > 0 && (
+          <div role="tablist" aria-label={view ? "Starred versions" : "Versions"} className="flex min-w-0 flex-wrap items-center">
+            {shown.map((p, i) => {
+              const on = p.id === chosen
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={on}
+                  aria-label={p.name}
+                  onClick={() => {
+                    choose?.(p.id)
+                    if (see) setSeeing("")
+                  }}
+                  className={cn(
+                    "group/chip relative flex h-6 min-w-5 cursor-pointer items-center justify-center gap-1 rounded-md text-xs leading-none whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-(--lab-ring)",
+                    on ? "mx-1 bg-(--lab-ink) px-2.5 text-(--lab-paper)" : "px-1 text-(--lab-muted) hover:bg-black/[0.05] hover:text-(--lab-ink)",
+                  )}
+                >
+                  {on ? <span className="max-w-[260px] truncate">{p.name}</span> : chipOf(p, i)}
+                  {p.hint && <span className={cn("text-[11px]", on ? "opacity-60" : "text-(--lab-quiet)")}>{p.hint}</span>}
+                  {marked?.has(p.id) && <Star aria-label="Starred" className="size-2.5 fill-(--lab-star) text-(--lab-star)" />}
+                  {p.locked && <Lock aria-label="Locked" className="size-3" />}
+                  {/* The name, at once on hover, for a version that shows only its letter. */}
+                  {!on && (
+                    <span
+                      role="tooltip"
+                      className="pointer-events-none invisible absolute top-full left-1/2 z-30 mt-1 -translate-x-1/2 rounded-md border border-(--lab-line) bg-(--lab-paper) px-2 py-1 text-xs text-(--lab-ink) opacity-0 shadow-md group-hover/chip:visible group-hover/chip:opacity-100 group-focus-visible/chip:visible group-focus-visible/chip:opacity-100"
+                    >
+                      {p.locked ? `${p.name} · Locked` : p.name}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
         <div className="ml-auto flex shrink-0 items-center gap-1">
           {extra && <div className="mr-1 flex items-center gap-2">{extra}</div>}
           {key && (
@@ -210,42 +250,6 @@ export function LabHead({
           {dials && dials.length > 0 && <DialsMenu dials={dials} />}
         </div>
       </div>
-      {/* The versions, as one switch. */}
-      {shown && shown.length > 0 && (
-        <div role="tablist" aria-label={view ? "Starred versions" : "Versions"} className="flex w-fit max-w-full flex-wrap items-center gap-0.5 rounded-lg border border-(--lab-line) bg-(--lab-paper)/70 p-0.5">
-          {shown.map((p, i) => {
-            const on = p.id === chosen
-            return (
-              <button
-                key={p.id}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                onClick={() => {
-                  choose?.(p.id)
-                  if (see) setSeeing("")
-                }}
-                title={p.locked ? "Locked" : p.title}
-                className={cn(
-                  "flex h-7 cursor-pointer items-center gap-1.5 rounded-md px-2.5 text-xs leading-none whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-(--lab-ring)",
-                  on ? "bg-(--lab-ink) text-(--lab-paper)" : "text-(--lab-muted) hover:bg-black/[0.04] hover:text-(--lab-ink)",
-                )}
-              >
-                <span className={cn("text-[11px]", on ? "opacity-60" : "text-(--lab-quiet)")}>{i + 1}</span>
-                {p.name}
-                {p.hint && <span className={cn("text-[11px]", on ? "opacity-60" : "text-(--lab-quiet)")}>{p.hint}</span>}
-                {marked?.has(p.id) && <Star aria-label="Starred" className="size-3 fill-(--lab-star) text-(--lab-star)" />}
-                {p.locked && <Lock aria-label="Locked" className="size-3" />}
-              </button>
-            )
-          })}
-        </div>
-      )}
-      {says && (
-        <p title={says} className="m-0 max-w-[1100px] text-pretty line-clamp-2 text-xs leading-4 text-(--lab-muted)">
-          {says}
-        </p>
-      )}
     </header>
     {see && key && (
       <SeeAll
@@ -270,13 +274,19 @@ export function LabHead({
   )
 }
 
-/** What the part asks, behind a mark beside its name. */
-function About({ children }: { children: React.ReactNode }) {
+/** A version's chip: the letter its name opens with ("A · Flat" is A), or
+    its number when the name has none. */
+function chipOf(p: LabPick, i: number) {
+  return p.name.match(/^(\S{1,3}) · /)?.[1] ?? String(i + 1)
+}
+
+/** What the part asks, and what the picked version does, behind one mark. */
+function About({ asks, name, says }: { asks?: React.ReactNode; name?: string; says?: string }) {
   return (
     <span className="group/about relative flex">
       <button
         type="button"
-        aria-label="What this part asks"
+        aria-label="What this part asks, and what the picked version does"
         className="flex size-6 cursor-default items-center justify-center rounded-md text-(--lab-quiet) outline-none hover:text-(--lab-ink) focus-visible:ring-2 focus-visible:ring-(--lab-ring)"
       >
         <Info className="size-3.5" />
@@ -285,7 +295,13 @@ function About({ children }: { children: React.ReactNode }) {
         role="tooltip"
         className="pointer-events-none invisible absolute top-full left-0 z-30 mt-1 w-[380px] rounded-lg border border-(--lab-line) bg-(--lab-paper) p-3 text-[13px] leading-[18px] text-(--lab-ink) opacity-0 shadow-md transition-opacity duration-150 group-focus-within/about:visible group-focus-within/about:opacity-100 group-hover/about:visible group-hover/about:opacity-100"
       >
-        {children}
+        {asks}
+        {says && (
+          <span className={cn("block", asks && "mt-2 border-t border-(--lab-line) pt-2")}>
+            {name && <span className="font-medium">{name}. </span>}
+            <span className="text-(--lab-muted)">{says}</span>
+          </span>
+        )}
       </span>
     </span>
   )

@@ -37,12 +37,15 @@ npx github:nadavpapay/lab-kit skill
 - **Rail** of labs. Drag to reorder. Right-click a tile to set its status
   (Not started, In progress, In review, Done). Done labs fold away at the
   foot, and a lab marked done reopens by itself when a new round lands.
-- **Drawer** of rounds. The newest round shows; older ones fold into Archive.
+- **Drawer** of rounds: Starred and Side by side on top, then the newest
+  round; older ones fold into Archive, newest first.
   The lab opens where you left it, or on a newer round if one has landed.
-- **Head** in two rows: where you are, with the star, See all and Dials on
-  the right, then the round's options as one switch. Numbers or ←/→ move
-  between them, S stars one, G shows them all at once, and Dials hold what
-  is still open, behind one button.
+- **Head** in one row: the link and an info mark, then the round's options
+  as letter chips (the picked one shows its name, so 20 fit), then the
+  star, See all and Dials on the right. The drawer names where you are, so
+  the head names it only while the drawer is hidden. Numbers or ←/→ move
+  between options, S stars one, G shows them all at once, and Dials hold
+  what is still open, behind one button.
 - **Starred** and **Side by side** gather every starred option of a lab.
 - **Addresses** are places (`/lab/<lab>/<round>`), and the link mark copies
   the place with what is picked, so a link lands on what you saw.

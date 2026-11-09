@@ -217,15 +217,20 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
           <PanelLeftOpen className="size-4" />
         </button>
       )}
-      <span className="text-(--lab-quiet)">{feature.name}</span>
-      <span aria-hidden className="text-(--lab-quiet)">/</span>
-      {(starSide || (!starring && part.group)) && (
+      {/* The drawer names where you are; with it hidden, the head does. */}
+      {!drawer && (
         <>
-          <span className="text-(--lab-quiet)">{starSide ? "Starred" : (part.sub ?? part.group)}</span>
+          <span className="text-(--lab-quiet)">{feature.name}</span>
           <span aria-hidden className="text-(--lab-quiet)">/</span>
+          {(starSide || (!starring && part.group)) && (
+            <>
+              <span className="text-(--lab-quiet)">{starSide ? "Starred" : (part.sub ?? part.group)}</span>
+              <span aria-hidden className="text-(--lab-quiet)">/</span>
+            </>
+          )}
+          <span className="font-medium">{starring ? "Starred" : starSide ? "Side by side" : part.name}</span>
         </>
       )}
-      <span className="font-medium">{starring ? "Starred" : starSide ? "Side by side" : part.name}</span>
       <CopyLink />
     </div>
   )
@@ -293,6 +298,8 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
                 Side by side
               </button>
             )}
+            {/* Stars above, rounds below. */}
+            {!feature.starless && live.length > 0 && <div aria-hidden className="mx-2 my-1.5 shrink-0 border-t border-(--lab-line)" />}
             {[...live, ...(archiveOpen ? archive : [])].map((p, i, list) => {
               const on = !starring && !starSide && p.id === part.id
               const starred = mine.filter((s) => s.part === p.id).length
@@ -304,7 +311,7 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
               return (
                 <Fragment key={p.id}>
                   {i === live.length && <ArchiveRow parts={archive} open={archiveOpen} holding={holding} onToggle={toggleArchive} />}
-                  {head && <p className={cn("m-0 px-2 text-[11px] leading-[14px] text-(--lab-quiet)", old ? "pt-3 pb-1 pl-6" : cn("pb-3", (i > 0 || !feature.starless) && "pt-5"))}>{label}</p>}
+                  {head && <p className={cn("m-0 px-2 text-[11px] leading-[14px] text-(--lab-quiet)", old ? "pt-3 pb-1 pl-6" : cn("pb-3", i > 0 ? "pt-5" : !feature.starless && "pt-2"))}>{label}</p>}
                   <button
                     type="button"
                     disabled={p.next}
