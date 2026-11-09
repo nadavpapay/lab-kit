@@ -115,7 +115,7 @@ export function RailItem({
             lines, so a long one never widens the item past the rail's edge. */}
         <span
           className={cn(
-            "w-16 text-center text-[11px] leading-[14px] text-balance hyphens-auto line-clamp-3 [overflow-wrap:anywhere]",
+            "w-[72px] text-center text-[11px] leading-[14px] text-balance line-clamp-3",
             on ? "text-(--lab-ink)" : "text-(--lab-quiet) group-hover/f:text-(--lab-muted)",
           )}
           title={name}

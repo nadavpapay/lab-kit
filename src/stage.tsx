@@ -19,14 +19,18 @@ export function useSize(ref: RefObject<HTMLElement | null>) {
 }
 
 /** The room under the head. `children` is given the scale that fits a
-    `w`×`h` thing whole, never past `max`, and draws it at that scale. */
+    `w`×`h` thing whole, never past `max`, and draws it at that scale. The
+    thing is drawn from the top of the room: a round whose versions differ in
+    height keeps its top edge in one place. */
 export function Stage({ w, h, max = 1, foot, children }: { w: number; h: number; max?: number; foot?: ReactNode; children: (scale: number) => ReactNode }) {
   const room = useRef<HTMLDivElement>(null)
   const { width, height } = useSize(room)
   const scale = Math.min(width / w, height / h, max)
   return (
     <div className="mx-6 mb-4 flex min-h-0 flex-1 flex-col items-center gap-4">
-      <div ref={room} className="flex min-h-0 w-full flex-1 items-center justify-center">
+      {/* The thing hangs from the top of the room, so switching between
+          versions of different heights does not move it up and down. */}
+      <div ref={room} className="flex min-h-0 w-full flex-1 items-start justify-center overflow-hidden">
         {scale > 0 && children(scale)}
       </div>
       {foot}
