@@ -15,7 +15,7 @@ import { atLab } from "./param"
    and adds a toggle with `useDial`. */
 
 export type { LabConfig } from "./config"
-export type { Feature, Part, PartProps } from "./feature"
+export type { Feature, Part, PartProps, Shelf } from "./feature"
 export type { LabPick } from "./head"
 export type { Dial, DialOption } from "./dials"
 export type { Status } from "./status"
@@ -24,10 +24,10 @@ export type { Starred } from "./stars"
 export { configureLab } from "./config"
 export { Lab } from "./lab"
 export { FrameCtx, LabHead } from "./head"
-export { Dials, useDial } from "./dials"
+export { Dials, DialsMenu, useDial } from "./dials"
 export { atLab, linkHere, pickOf, setPick, useParam } from "./param"
 export { useOwnArrows } from "./rounds"
-export { Segmented, Stage, useSize } from "./stage"
+export { Fill, Segmented, Stage, useSize } from "./stage"
 export { cn } from "./cn"
 
 type Files = Record<string, { default: Feature }>

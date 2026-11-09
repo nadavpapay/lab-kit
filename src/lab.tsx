@@ -3,6 +3,7 @@ import { PanelLeftClose, PanelLeftOpen, Star } from "lucide-react"
 
 import { config, keys, local } from "./config"
 import type { Feature, Part } from "./feature"
+import type { LucideIcon } from "lucide-react"
 import { FrameCtx, LabHead, type LabPick } from "./head"
 import { CopyLink } from "./link"
 import { putPicks, useParam } from "./param"
@@ -54,6 +55,30 @@ const roundOf = (p: Part) => ((p.sub ?? p.group)?.match(/^Round (\d+)/) ?? p.nam
 const STORE = () => local("lab-drawer-open")
 const ARCHIVE = () => local("lab-archive")
 const LAST = () => local("lab-last")
+const SHELF_LAST = () => local("lab-shelf-last")
+
+/** A tile on the rail: one lab, or every lab on one shelf. */
+type Tile = { id: string; short: string; Icon: LucideIcon; features: Feature[] }
+
+function tilesOf(features: Feature[]): Tile[] {
+  const tiles: Tile[] = []
+  for (const f of features) {
+    const id = f.shelf?.id ?? f.id
+    const t = tiles.find((x) => x.id === id)
+    if (t) t.features.push(f)
+    else tiles.push({ id, short: f.shelf?.short ?? f.short, Icon: f.shelf?.Icon ?? f.Icon, features: [f] })
+  }
+  return tiles
+}
+
+/** Which lab of each shelf was open last, so its tile reopens on it. */
+function shelfLast(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(SHELF_LAST()) ?? "{}")
+  } catch {
+    return {}
+  }
+}
 
 function readOpen(): Record<string, boolean> {
   try {
@@ -64,7 +89,8 @@ function readOpen(): Record<string, boolean> {
 }
 
 export function Lab({ features: FEATURES }: { features: Feature[] }) {
-  const PARTS = Object.fromEntries(FEATURES.map((f) => [keys.status(f.id), f.parts.filter((p) => !p.next).length]))
+  const TILES = tilesOf(FEATURES)
+  const PARTS = Object.fromEntries(TILES.map((t) => [keys.status(t.id), t.features.reduce((n, f) => n + f.parts.filter((p) => !p.next).length, 0)]))
 
   // The lab's own tab icon, when it has one.
   useEffect(() => {
@@ -94,7 +120,14 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
   })
 
   const [status, setStatus] = useLabStatus(PARTS)
-  const rail = useRailOrder(FEATURES.map((f) => f.id))
+  const rail = useRailOrder(TILES.map((t) => t.id))
+  const tile = TILES.find((t) => t.features.includes(feature))!
+  const shelf = feature.shelf
+  /* Opens a lab where it was left, or on its newest round. */
+  const openLab = (f: Feature) => {
+    setFeatureId(f.id)
+    setPartId(place.recall(f.id, f.parts))
+  }
   const [stars, toggleStar, noteStar] = useStars()
   const starKeys = new Set(stars.map((s) => s.key))
 
@@ -147,6 +180,13 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
   const place = useLastPlace(LAST())
   useEffect(() => {
     if (!IN_FRAME && feature.id === featureId && feature.parts.some((p) => p.id === partId)) place.keep(feature.id, part.id, top.id)
+    if (!IN_FRAME && shelf && shelfLast()[shelf.id] !== feature.id) {
+      try {
+        localStorage.setItem(SHELF_LAST(), JSON.stringify({ ...shelfLast(), [shelf.id]: feature.id }))
+      } catch {
+        /* Held for this visit only. */
+      }
+    }
   })
 
   useEffect(() => {
@@ -223,58 +263,9 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
     </StarsCtx.Provider>
   )
 
-  /* A frame of Side by side: the round alone, filling the frame. */
-  if (IN_FRAME)
-    return (
-      <>
-        <FrameCtx.Provider value={true}>
-          <div className="flex h-dvh w-full overflow-hidden bg-(--lab-chrome) pt-6 font-sans text-(--lab-ink)">
-            {content}
-          </div>
-        </FrameCtx.Provider>
-      </>
-    )
-
-  return (
+  /* The open lab's rows: Starred, Side by side, then its rounds. */
+  const parts = (
     <>
-      <div
-        className="flex h-dvh w-full overflow-hidden bg-(--lab-chrome) font-sans text-(--lab-ink)"
-      >
-        {/* More labs than the screen is tall: the rail scrolls on its own, its bar hidden so it keeps its width. */}
-        <nav aria-label="Labs" className="flex min-h-0 w-20 shrink-0 flex-col items-center gap-3 overflow-y-auto overscroll-contain border-r border-(--lab-line) bg-(--lab-rail) py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <RailRuns rail="rail" items={rail.sort(FEATURES)} picked={feature.id} stage={(id) => status[keys.status(id)]} onMove={rail.move}>
-            {(f, lifted) => (
-              <RailItem
-                name={f.short}
-                Icon={f.Icon}
-                on={f.id === feature.id}
-                lifted={lifted}
-                status={status[keys.status(f.id)]}
-                onOpen={() => {
-                  /* A lab opens where it was left, or on its newest round. */
-                  setFeatureId(f.id)
-                  setPartId(place.recall(f.id, f.parts))
-                }}
-                onStatus={(next) => setStatus(keys.status(f.id), next)}
-              />
-            )}
-          </RailRuns>
-        </nav>
-
-        <div className={cn("shrink-0 overflow-hidden transition-[width] duration-200 ease-out", drawer ? "w-56 border-r border-(--lab-line)" : "w-0")} inert={!drawer}>
-          <nav aria-label="Parts" className="flex h-full w-56 flex-col gap-1 overflow-y-auto px-4 py-4">
-            <div className="mb-3 flex h-8 items-center justify-between pl-2">
-              <span className="text-[13px] leading-[18px] font-medium">{feature.name}</span>
-              <button
-                type="button"
-                onClick={toggle}
-                title="Hide the parts  ⌘\"
-                aria-label="Hide the parts"
-                className="-mr-1 flex size-7 cursor-pointer items-center justify-center rounded-md text-(--lab-quiet) outline-none hover:bg-black/[0.05] hover:text-(--lab-ink) focus-visible:ring-2 focus-visible:ring-(--lab-ring)"
-              >
-                <PanelLeftClose className="size-4" />
-              </button>
-            </div>
             {!feature.starless && (
               <button
                 type="button"
@@ -338,6 +329,79 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
               )
             })}
             {!archiveOpen && archive.length > 0 && <ArchiveRow parts={archive} open={false} holding={false} onToggle={toggleArchive} />}
+    </>
+  )
+
+  /* A frame of Side by side: the round alone, filling the frame. */
+  if (IN_FRAME)
+    return (
+      <>
+        <FrameCtx.Provider value={true}>
+          <div className="flex h-dvh w-full overflow-hidden bg-(--lab-chrome) pt-6 font-sans text-(--lab-ink)">
+            {content}
+          </div>
+        </FrameCtx.Provider>
+      </>
+    )
+
+  return (
+    <>
+      <div
+        className="flex h-dvh w-full overflow-hidden bg-(--lab-chrome) font-sans text-(--lab-ink)"
+      >
+        {/* More labs than the screen is tall: the rail scrolls on its own, its bar hidden so it keeps its width. */}
+        <nav aria-label="Labs" className="flex min-h-0 w-20 shrink-0 flex-col items-center gap-3 overflow-y-auto overscroll-contain border-r border-(--lab-line) bg-(--lab-rail) py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <RailRuns rail="rail" items={rail.sort(TILES)} picked={tile.id} stage={(id) => status[keys.status(id)]} onMove={rail.move}>
+            {(t, lifted) => (
+              <RailItem
+                name={t.short}
+                Icon={t.Icon}
+                on={t.id === tile.id}
+                lifted={lifted}
+                status={status[keys.status(t.id)]}
+                onOpen={() => {
+                  if (t.id === tile.id && t.features.length > 1) return
+                  openLab(t.features.find((f) => f.id === shelfLast()[t.id]) ?? t.features[0])
+                }}
+                onStatus={(next) => setStatus(keys.status(t.id), next)}
+              />
+            )}
+          </RailRuns>
+        </nav>
+
+        <div className={cn("shrink-0 overflow-hidden transition-[width] duration-200 ease-out", drawer ? "w-56 border-r border-(--lab-line)" : "w-0")} inert={!drawer}>
+          <nav aria-label="Parts" className="flex h-full w-56 flex-col gap-1 overflow-y-auto px-4 py-4">
+            <div className="mb-3 flex h-8 items-center justify-between pl-2">
+              <span className="min-w-0 truncate text-[13px] leading-[18px] font-medium">{shelf?.name ?? feature.name}</span>
+              <button
+                type="button"
+                onClick={toggle}
+                title="Hide the parts  ⌘\"
+                aria-label="Hide the parts"
+                className="-mr-1 flex size-7 cursor-pointer items-center justify-center rounded-md text-(--lab-quiet) outline-none hover:bg-black/[0.05] hover:text-(--lab-ink) focus-visible:ring-2 focus-visible:ring-(--lab-ring)"
+              >
+                <PanelLeftClose className="size-4" />
+              </button>
+            </div>
+            {shelf
+              ? tile.features.map((f, i) => (
+                  <Fragment key={f.id}>
+                    <button
+                      type="button"
+                      onClick={() => f.id !== feature.id && openLab(f)}
+                      aria-expanded={f.id === feature.id}
+                      className={cn(
+                        "flex h-8 shrink-0 items-center gap-2 rounded-md px-2 text-left text-[13px] leading-[18px] outline-none focus-visible:ring-2 focus-visible:ring-(--lab-ring)",
+                        f.id === feature.id ? "cursor-default font-medium" : "cursor-pointer text-(--lab-muted) hover:bg-black/[0.04] hover:text-(--lab-ink)",
+                      )}
+                    >
+                      <span className="w-4 shrink-0 text-right text-[11px] leading-[14px] font-normal text-(--lab-quiet) tabular-nums">{i + 1}</span>
+                      <span className="min-w-0 truncate">{f.name}</span>
+                    </button>
+                    {f.id === feature.id && <div className="mb-2 ml-[19px] flex flex-col gap-1 border-l border-(--lab-line) pl-2">{parts}</div>}
+                  </Fragment>
+                ))
+              : parts}
           </nav>
         </div>
 

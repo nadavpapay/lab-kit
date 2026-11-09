@@ -64,3 +64,16 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
   )
 }
 
+
+/** The whole room under the head, edge to edge, for a thing that should take
+    all of it, such as a real page in a frame. `children` is given the room's
+    width and height and draws at that size. */
+export function Fill({ className, children }: { className?: string; children: (size: { width: number; height: number }) => ReactNode }) {
+  const room = useRef<HTMLDivElement>(null)
+  const size = useSize(room)
+  return (
+    <div ref={room} className={cn("relative min-h-0 flex-1 overflow-hidden", className)}>
+      {size.width > 0 && size.height > 0 && children(size)}
+    </div>
+  )
+}

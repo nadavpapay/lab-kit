@@ -54,7 +54,8 @@ the lab's `vite.config.ts`.
 - Draw options with the project's real components and tokens. Never invent
   UI the product doesn't have unless the round is about that new UI.
 - Shown in a frame at a fixed width (a whole page)? `useSize` and `Stage`
-  scale it; see the README.
+  scale it; `Fill` gives it all the room under the head. See the README.
+- Several labs about one thing share one rail tile with `shelf`.
 - When the person picks, write the pick into the round's `asks` or a short
   note, make it the default, and stop offering the others in new work.
 

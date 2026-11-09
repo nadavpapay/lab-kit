@@ -45,4 +45,16 @@ export type Feature = {
   /** Parts folded into others: an old part's id, and the picks, as a query
       with its new `part`, that open what it showed. */
   moved?: Record<string, string>
+  /** One tile on the rail for many labs. Labs that name the same shelf share
+      its tile, and the drawer lists them, the open one unfolded to its parts. */
+  shelf?: Shelf
+}
+
+export type Shelf = {
+  id: string
+  /** Its name over the drawer. */
+  name: string
+  /** Its name on the rail. */
+  short: string
+  Icon: LucideIcon
 }
