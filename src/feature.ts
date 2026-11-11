@@ -28,6 +28,8 @@ export type Part = {
   asks?: string
   /** Shown in the drawer and not yet open. */
   next?: boolean
+  /** Folds into Archive whatever round it names: a topic a later one replaced. */
+  archived?: boolean
   Draw: (p: PartProps) => ReactNode
 }
 

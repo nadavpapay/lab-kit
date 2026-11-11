@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from "react"
-import { PanelLeftClose, PanelLeftOpen, Star } from "lucide-react"
+import { ChevronRight, PanelLeftClose, PanelLeftOpen, Star } from "lucide-react"
 
 import { config, keys, local } from "./config"
 import type { Feature, Part } from "./feature"
@@ -9,7 +9,7 @@ import { CopyLink } from "./link"
 import { putPicks, useParam } from "./param"
 import { RailItem } from "./rail-item"
 import { RailRuns, useRailOrder } from "./rail-order"
-import { arrange, ArchiveRow, newest, useArchive, useLastPlace, useOwnArrows, useRowKeys } from "./rounds"
+import { arrange, ArchiveRow, newest, topicOf, useArchive, useLastPlace, useOwnArrows, useRowKeys } from "./rounds"
 import { useSize } from "./stage"
 import { restore, StarsCtx, useStars, type Starred } from "./stars"
 import { useLabStatus } from "./status"
@@ -56,6 +56,12 @@ const STORE = () => local("lab-drawer-open")
 const ARCHIVE = () => local("lab-archive")
 const LAST = () => local("lab-last")
 const SHELF_LAST = () => local("lab-shelf-last")
+
+/** A row's label in Archive: its topic and round, or whichever it names. */
+function archived(p: Part): string | undefined {
+  const topic = topicOf(p) || undefined
+  return topic && p.sub ? `${topic} · ${p.sub}` : (p.sub ?? topic)
+}
 
 /** A tile on the rail: one lab, or every lab on one shelf. */
 type Tile = { id: string; short: string; Icon: LucideIcon; features: Feature[] }
@@ -304,9 +310,9 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
               const on = !starring && !starSide && p.id === part.id
               const starred = mine.filter((s) => s.part === p.id).length
               const old = i >= live.length
-              /* In Archive a row's round or topic is its label; the fold says the rest. */
-              const label = old ? (p.sub ?? (p.group === "Earlier" ? undefined : p.group)) : p.group
-              const said = list[i - 1] && (i - 1 >= live.length ? (list[i - 1].sub ?? (list[i - 1].group === "Earlier" ? undefined : list[i - 1].group)) : list[i - 1].group)
+              /* In Archive a row's topic and round are its label, since the fold mixes topics; the fold says the rest. */
+              const label = old ? archived(p) : p.group
+              const said = list[i - 1] && (i - 1 >= live.length ? archived(list[i - 1]) : list[i - 1].group)
               const head = label && (i === live.length || label !== said)
               return (
                 <Fragment key={p.id}>
@@ -391,7 +397,7 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
               </button>
             </div>
             {shelf
-              ? tile.features.map((f, i) => (
+              ? tile.features.map((f) => (
                   <Fragment key={f.id}>
                     <button
                       type="button"
@@ -402,7 +408,7 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
                         f.id === feature.id ? "cursor-default font-medium" : "cursor-pointer text-(--lab-muted) hover:bg-black/[0.04] hover:text-(--lab-ink)",
                       )}
                     >
-                      <span className="w-4 shrink-0 text-right text-[11px] leading-[14px] font-normal text-(--lab-quiet) tabular-nums">{i + 1}</span>
+                      <ChevronRight aria-hidden className={cn("size-3.5 shrink-0 text-(--lab-quiet) transition-transform duration-150", f.id === feature.id && "rotate-90")} />
                       <span className="min-w-0 truncate">{f.name}</span>
                     </button>
                     {f.id === feature.id && <div className="mb-2 ml-[19px] flex flex-col gap-1 border-l border-(--lab-line) pl-2">{parts}</div>}

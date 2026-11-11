@@ -28,7 +28,7 @@ export function roundNumber(p: Row): number {
 
 /** A lab cut by topic keeps a newest round per topic; a heading that is a
     round, or only says earlier, is no topic. */
-const topicOf = (p: Row) => (!p.group || p.group === "Earlier" || ROUND.test(p.group) ? "" : p.group)
+export const topicOf = (p: Row) => (!p.group || p.group === "Earlier" || ROUND.test(p.group) ? "" : p.group)
 
 /** The drawer's two runs: what stays out, and the earlier rounds, newest first. */
 export function arrange<T extends Row>(parts: readonly T[]): { live: T[]; archive: T[] } {
@@ -112,7 +112,7 @@ export function useArchive(store: string, feature: string, holding: boolean): [b
 
 /** The row that folds the earlier rounds, with how many there are. */
 export function ArchiveRow({ parts, open, holding, onToggle }: { parts: readonly Row[]; open: boolean; holding: boolean; onToggle: () => void }) {
-  const count = new Set(parts.map((p) => roundNumber(p) || p.id)).size
+  const count = new Set(parts.map((p) => `${topicOf(p)}|${roundNumber(p) || p.id}`)).size
   return (
     <button
       type="button"
