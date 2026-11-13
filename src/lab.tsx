@@ -94,7 +94,10 @@ function readOpen(): Record<string, boolean> {
   }
 }
 
-export function Lab({ features: FEATURES }: { features: Feature[] }) {
+/* `height` is the frame's height class. The lab fills the window by default;
+   a lab hosted under an app's own bar passes "h-full" and sits in a box that
+   is the room left under it. */
+export function Lab({ features: FEATURES, height = "h-dvh" }: { features: Feature[]; height?: string }) {
   const TILES = tilesOf(FEATURES)
   const PARTS = Object.fromEntries(TILES.map((t) => [keys.status(t.id), t.features.reduce((n, f) => n + f.parts.filter((p) => !p.next).length, 0)]))
 
@@ -360,7 +363,7 @@ export function Lab({ features: FEATURES }: { features: Feature[] }) {
   return (
     <>
       <div
-        className="flex h-dvh w-full overflow-hidden bg-(--lab-chrome) font-sans text-(--lab-ink)"
+        className={cn("flex w-full overflow-hidden bg-(--lab-chrome) font-sans text-(--lab-ink)", height)}
       >
         {/* More labs than the screen is tall: the rail scrolls on its own, its bar hidden so it keeps its width. */}
         <nav aria-label="Labs" className="flex min-h-0 w-20 shrink-0 flex-col items-center gap-3 overflow-y-auto overscroll-contain border-r border-(--lab-line) bg-(--lab-rail) py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
